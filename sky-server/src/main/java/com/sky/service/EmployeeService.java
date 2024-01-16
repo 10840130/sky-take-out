@@ -10,6 +10,7 @@ public interface EmployeeService {
 
     /**
      * 员工登录
+     *
      * @param employeeLoginDTO
      * @return
      */
@@ -17,12 +18,14 @@ public interface EmployeeService {
 
     /**
      * 新增員工
+     *
      * @param employeeDTO
      */
     void save(EmployeeDTO employeeDTO);
 
     /**
      * 分頁查詢
+     *
      * @param employeePageQueryDTO
      * @return
      */
@@ -30,8 +33,23 @@ public interface EmployeeService {
 
     /**
      * 啟用禁用員工帳號
+     *
      * @param status
      * @param id
      */
     void startOrStop(Integer status, Long id);
+
+    /**
+     * 根據id查詢員工資料
+     *
+     * @param id
+     * @return
+     */
+    Employee getById(Long id);
+
+    /**
+     * 編輯員工資料
+     * @param employeeDTO
+     */
+    void update(EmployeeDTO employeeDTO);
 }

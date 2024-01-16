@@ -100,6 +100,7 @@ public class EmployeeController {
 
     /**
      * 啟用禁用員工帳號
+     *
      * @param status
      * @param id
      * @return
@@ -107,8 +108,35 @@ public class EmployeeController {
     @PostMapping("/status/{status}")
     @ApiOperation("啟用禁用員工帳號")
     public Result startOrStop(@PathVariable Integer status, Long id) {
-        log.info("啟用禁用員工帳號:{},{}",status,id);
-        employeeService.startOrStop(status,id);
+        log.info("啟用禁用員工帳號:{},{}", status, id);
+        employeeService.startOrStop(status, id);
+        return Result.success();
+    }
+
+    /**
+     * 根據id查詢員工資料
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("根據id查詢員工資料")
+    public Result<Employee> getById(@PathVariable Long id) {
+        Employee employee = employeeService.getById(id);
+        return Result.success(employee);
+    }
+
+    /**
+     * 編輯員工資料
+     *
+     * @param employeeDTO
+     * @return
+     */
+    @PutMapping
+    @ApiOperation("編輯員工資料")
+    public Result update(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("編輯員工資料: {}",employeeDTO);
+        employeeService.update(employeeDTO);
         return Result.success();
     }
 
