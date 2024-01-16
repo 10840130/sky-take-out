@@ -86,15 +86,30 @@ public class EmployeeController {
 
     /**
      * 員工分頁查詢
+     *
      * @param employeePageQueryDTO
      * @return
      */
     @GetMapping("/page")
     @ApiOperation("員工分頁查詢")
-    public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO){
-        log.info("員工分頁查詢，參數為:{}",employeePageQueryDTO);
+    public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO) {
+        log.info("員工分頁查詢，參數為:{}", employeePageQueryDTO);
         PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 啟用禁用員工帳號
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("啟用禁用員工帳號")
+    public Result startOrStop(@PathVariable Integer status, Long id) {
+        log.info("啟用禁用員工帳號:{},{}",status,id);
+        employeeService.startOrStop(status,id);
+        return Result.success();
     }
 
 }
