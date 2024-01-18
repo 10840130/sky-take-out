@@ -6,3 +6,10 @@ sky:
     database: sky_take_out
     username: root
     password: 1234
+
+  aws:
+    access-key: AKIA4MTWNVFE6HLQEBN5
+    secret-key: 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
+    region: ap-northeast-1
+    bucket-name: sky-itcast1
+#    endpoint:
