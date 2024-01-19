@@ -92,17 +92,72 @@ public class DishServiceImpl implements DishService {
         }
         // 判斷當前菜品是否能夠刪除---是否被套餐關聯
         List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishIds(ids);
-        if (setmealIds != null && setmealIds.size() > 0){
+        if (setmealIds != null && setmealIds.size() > 0) {
             // 當前菜品被套餐關聯，不能被刪除
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }
 
         // 刪除菜品表中的菜品資料
-        for (Long id : ids) {
+        /*for (Long id : ids) {
             dishMapper.deleteById(id);
             // 刪除菜品關聯的口味資料
             dishFlavorMapper.deleteByDishId(id);
-        }
+        }*/
 
+        // 根據菜品id集合，批量刪除菜品資料
+        // sql: delete from dish where id in {?,?,?}
+        dishMapper.deleteByIds(ids);
+
+        // 根據菜品id集合，批量刪除關聯的口味資料
+        // sql: delete from dish_flavor where dish_id in {?,?,?}
+        dishFlavorMapper.deleteByDishIds(ids);
+
+    }
+
+    /**
+     * 根據id查詢菜品與對應口味資料
+     *
+     * @param id
+     * @return
+     */
+    @Transactional
+    public DishVO getByIdWithFlavor(Long id) {
+        //根據id查詢菜品資料
+        Dish dish = dishMapper.getById(id);
+
+        //根據菜品id查詢口味資料
+        List<DishFlavor> dishFlavors = dishFlavorMapper.getByDishId(id);
+
+        //將查詢到的資料封裝到VO
+        DishVO dishVO = new DishVO();
+        BeanUtils.copyProperties(dish,dishVO);
+        dishVO.setFlavors(dishFlavors);
+
+        return dishVO;
+    }
+
+    /**
+     * 根據id修改菜品與對應的口味資料
+     * @param dishDTO
+     */
+    public void updateWithFlavor(DishDTO dishDTO) {
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO,dish);
+        //修改菜品表基本資料
+        dishMapper.update(dish);
+
+        //刪除原有的口味資料
+        dishFlavorMapper.deleteByDishId(dishDTO.getId());
+
+        //重新新增口味資料
+        List<DishFlavor> flavors = dishDTO.getFlavors();
+
+        if (flavors != null && flavors.size() > 0) {
+            flavors.forEach(dishFlavor -> {
+                dishFlavor.setDishId(dishDTO.getId());
+            });
+            //向口味表插入資料
+            dishFlavorMapper.insertBatch(flavors);
+        }
     }
 }
