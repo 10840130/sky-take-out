@@ -130,7 +130,7 @@ public class DishServiceImpl implements DishService {
 
         //將查詢到的資料封裝到VO
         DishVO dishVO = new DishVO();
-        BeanUtils.copyProperties(dish,dishVO);
+        BeanUtils.copyProperties(dish, dishVO);
         dishVO.setFlavors(dishFlavors);
 
         return dishVO;
@@ -138,11 +138,12 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 根據id修改菜品與對應的口味資料
+     *
      * @param dishDTO
      */
     public void updateWithFlavor(DishDTO dishDTO) {
         Dish dish = new Dish();
-        BeanUtils.copyProperties(dishDTO,dish);
+        BeanUtils.copyProperties(dishDTO, dish);
         //修改菜品表基本資料
         dishMapper.update(dish);
 
@@ -159,5 +160,19 @@ public class DishServiceImpl implements DishService {
             //向口味表插入資料
             dishFlavorMapper.insertBatch(flavors);
         }
+    }
+
+    /**
+     * 根據分類id查詢菜品
+     *
+     * @param categoryId
+     * @return
+     */
+    public List<Dish> list(Long categoryId) {
+        Dish dish = Dish.builder()
+                .categoryId(categoryId)
+                .status(StatusConstant.ENABLE)
+                .build();
+        return dishMapper.list(dish);
     }
 }
