@@ -86,14 +86,29 @@ public class SetmealController {
 
     /**
      * 修改套餐
+     *
      * @param setmealDTO
      * @return
      */
     @PutMapping
     @ApiOperation("修改套餐")
-    public Result update(@RequestBody SetmealDTO setmealDTO){
-        log.info("修改套餐 :{}",setmealDTO);
+    public Result update(@RequestBody SetmealDTO setmealDTO) {
+        log.info("修改套餐 :{}", setmealDTO);
         setmealService.updateWithDish(setmealDTO);
+        return Result.success();
+    }
+
+    /**
+     * 啟用禁用套餐
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("啟用禁用套餐")
+    public Result startOrStop(@PathVariable Integer status, Long id) {
+        log.info("啟用禁用套餐 :{},{}",status,id);
+        setmealService.startOrStop(status,id);
         return Result.success();
     }
 
