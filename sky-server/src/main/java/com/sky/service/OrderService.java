@@ -2,6 +2,7 @@ package com.sky.service;
 
 import com.sky.dto.OrdersConfirmDTO;
 import com.sky.dto.OrdersPageQueryDTO;
+import com.sky.dto.OrdersRejectionDTO;
 import com.sky.result.PageResult;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderVO;
@@ -19,12 +20,14 @@ public interface OrderService {
 
     /**
      * 各狀態的訂單統計
+     *
      * @return
      */
     OrderStatisticsVO statistics();
 
     /**
      * 查詢訂單詳情
+     *
      * @param id
      * @return
      */
@@ -32,7 +35,15 @@ public interface OrderService {
 
     /**
      * 接單
+     *
      * @param ordersConfirmDTO
      */
     void confrim(OrdersConfirmDTO ordersConfirmDTO);
+
+    /**
+     * 拒單
+     *
+     * @return
+     */
+    void rejection(OrdersRejectionDTO ordersRejectionDTO) throws Exception;
 }

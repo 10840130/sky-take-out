@@ -2,10 +2,13 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
 import com.sky.dto.OrdersConfirmDTO;
 import com.sky.dto.OrdersPageQueryDTO;
+import com.sky.dto.OrdersRejectionDTO;
 import com.sky.entity.OrderDetail;
 import com.sky.entity.Orders;
+import com.sky.exception.OrderBusinessException;
 import com.sky.mapper.OrderDetailMapper;
 import com.sky.mapper.OrderMapper;
 import com.sky.result.PageResult;
@@ -18,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,29 +76,31 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 根據訂單ID獲取菜品訊息
+     *
      * @param orders
      * @return
      */
     private String getOrderDishesStr(Orders orders) {
         List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(orders.getId());
 
-        List<String> orderDishList = orderDetailList.stream().map(x->{
-            String orderDish = x.getName()+"*"+x.getNumber()+";";
+        List<String> orderDishList = orderDetailList.stream().map(x -> {
+            String orderDish = x.getName() + "*" + x.getNumber() + ";";
             return orderDish;
         }).collect(Collectors.toList());
-        return String.join("",orderDishList);
+        return String.join("", orderDishList);
     }
 
 
     /**
      * 各狀態的訂單統計
+     *
      * @return
      */
     public OrderStatisticsVO statistics() {
         //根據狀態，分別查詢訂單數量
-        Integer toBeConfirmed =orderMapper.countStatus(Orders.TO_BE_CONFIRMED);
-        Integer Confirmed =orderMapper.countStatus(Orders.CONFIRMED);
-        Integer deliveryInProgress =orderMapper.countStatus(Orders.DELIVERY_IN_PROGRESS);
+        Integer toBeConfirmed = orderMapper.countStatus(Orders.TO_BE_CONFIRMED);
+        Integer Confirmed = orderMapper.countStatus(Orders.CONFIRMED);
+        Integer deliveryInProgress = orderMapper.countStatus(Orders.DELIVERY_IN_PROGRESS);
 
         //將資料封裝給orderStatisticsVO
         OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();
@@ -106,6 +113,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 查詢訂單詳情
+     *
      * @param id
      * @return
      */
@@ -116,7 +124,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(orders.getId());
         //將該訂單封裝進OrderVO
         OrderVO orderVO = new OrderVO();
-        BeanUtils.copyProperties(orders,orderVO);
+        BeanUtils.copyProperties(orders, orderVO);
         orderVO.setOrderDetailList(orderDetailList);
 
         return orderVO;
@@ -124,6 +132,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 接單
+     *
      * @param ordersConfirmDTO
      */
     public void confrim(OrdersConfirmDTO ordersConfirmDTO) {
@@ -131,6 +140,38 @@ public class OrderServiceImpl implements OrderService {
                 .id(ordersConfirmDTO.getId())
                 .status(Orders.CONFIRMED)
                 .build();
+
+        orderMapper.update(orders);
+    }
+
+
+    /**
+     * 拒單
+     *
+     * @return
+     */
+    public void rejection(OrdersRejectionDTO ordersRejectionDTO) throws Exception {
+        Orders ordersDB = orderMapper.getById(ordersRejectionDTO.getId());
+        //訂單處於待接單，才可執行拒單，將訂單修改為已取消
+        if (ordersDB == null || !ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        //拒單時若已付款，必須退款  -> WeChat實現付款機制，暫無法完成
+        /*Integer payStatus = ordersDB.getPayStatus();
+        if(payStatus.equals(Orders.PAID)){
+            String refund = weChatPayUtil.refund(
+                    ordersDB.getNumber(),
+                    ordersDB.getNumber(),
+                    new BigDecimal(0.01),
+                    new BigDecimal(0.01));
+        }*/
+        //拒單時必須更新狀態、原因、時間
+        Orders orders = new Orders();
+        orders.setId(ordersDB.getId());
+        orders.setStatus(Orders.CANCELLED);
+        orders.setRejectionReason(ordersRejectionDTO.getRejectionReason());
+        orders.setCancelTime(LocalDateTime.now());
 
         orderMapper.update(orders);
     }
