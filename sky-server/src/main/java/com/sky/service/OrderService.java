@@ -50,7 +50,24 @@ public interface OrderService {
 
     /**
      * 取消訂單
+     *
      * @return
      */
-    void cancel(OrdersCancelDTO ordersCancelDTO)throws Exception;
+    void cancel(OrdersCancelDTO ordersCancelDTO) throws Exception;
+
+    /**
+     * 派送訂單
+     *
+     * @return
+     */
+    void delivery(Long id);
+
+    /**
+     * 完成訂單
+     *
+     * @return
+     */
+    void complete(Long id);
+
+
 }
