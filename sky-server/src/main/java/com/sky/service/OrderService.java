@@ -1,5 +1,6 @@
 package com.sky.service;
 
+import com.sky.dto.OrdersCancelDTO;
 import com.sky.dto.OrdersConfirmDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersRejectionDTO;
@@ -46,4 +47,10 @@ public interface OrderService {
      * @return
      */
     void rejection(OrdersRejectionDTO ordersRejectionDTO) throws Exception;
+
+    /**
+     * 取消訂單
+     * @return
+     */
+    void cancel(OrdersCancelDTO ordersCancelDTO)throws Exception;
 }
