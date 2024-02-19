@@ -11,12 +11,14 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface DishMapper {
 
     /**
      * 根据分类id查询菜品数量
+     *
      * @param categoryId
      * @return
      */
@@ -25,6 +27,7 @@ public interface DishMapper {
 
     /**
      * 插入菜品資料
+     *
      * @param dish
      */
     @AutoFill(value = OperationType.INSERT)
@@ -32,6 +35,7 @@ public interface DishMapper {
 
     /**
      * 菜品分頁查詢
+     *
      * @param dishPageQueryDTO
      * @return
      */
@@ -39,6 +43,7 @@ public interface DishMapper {
 
     /**
      * 根據主鍵查詢菜品
+     *
      * @param id
      * @return
      */
@@ -47,6 +52,7 @@ public interface DishMapper {
 
     /**
      * 根據主鍵刪除菜品資料
+     *
      * @param id
      */
     @Delete("delete from dish where id = #{id}")
@@ -54,12 +60,14 @@ public interface DishMapper {
 
     /**
      * 根據菜品id集合，批量刪除菜品
+     *
      * @param ids
      */
     void deleteByIds(List<Long> ids);
 
     /**
      * 根據id動態修改菜品
+     *
      * @param dish
      */
     @AutoFill(value = OperationType.UPDATE)
@@ -67,6 +75,7 @@ public interface DishMapper {
 
     /**
      * 動態條件查詢菜品
+     *
      * @param dish
      * @return
      */
@@ -74,9 +83,20 @@ public interface DishMapper {
 
     /**
      * 根據套餐id查菜品
+     *
      * @param id
      * @return
      */
     @Select("select a.* from dish a left join setmeal_dish b on a.id = b.dish_id where b.setmeal_id = #{setmealId}")
     List<Dish> getBySetmealId(Long id);
+
+
+    /**
+     * 根据条件统计菜品数量
+     *
+     * @param map
+     * @return
+     */
+    Integer countByMap(Map map);
+
 }
